@@ -38,6 +38,13 @@ spec:
         volumeMounts:
         - name: dvo-config
           mountPath: /config
+        resources:
+          requests:
+            memory: "200Mi"
+            cpu: "100m"
+          limits:
+            memory: "400Mi"
+            cpu: "200m"
       volumes:
       - name: dvo-config
         configMap:
@@ -45,10 +52,4 @@ spec:
       restartPolicy: Always
       serviceAccount: deployment-validation-operator
       terminationGracePeriodSeconds: 30
-      resources:
-        requests:
-          memory: "200Mi"
-          cpu: "100m"
-        limits:
-          memory: "400Mi"
-          cpu: "200m"
+      
