@@ -28,7 +28,7 @@ spec:
         - --config /config/deployment-validation-operator-config.yaml
         env:
         - name: WATCH_NAMESPACE
-          value: ""
+          value: "default"
         - name: OPERATOR_NAME
           value: "deployment-validation-operator"
         - name: POD_NAME
