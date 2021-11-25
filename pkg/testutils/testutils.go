@@ -13,12 +13,15 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/mcuadros/go-defaults"
 	apps_v1 "k8s.io/api/apps/v1"
+	v1 "k8s.io/api/core/v1"
 )
 
 type TemplateArgs struct {
-	Replicas         int  `default:"3"`
-	ResourceLimits   bool `default:"true"`
-	ResourceRequests bool `default:"true"`
+	Replicas         int    `default:"3"`
+	ResourceLimits   bool   `default:"true"`
+	ResourceRequests bool   `default:"true"`
+	Name             string `default:"default"`
+	Namespace        string `default:"github-mirror-production"`
 }
 
 func NewTemplateArgs() *TemplateArgs {
@@ -44,8 +47,12 @@ func CreateReplicaSetFromTemplate(args *TemplateArgs) (apps_v1.ReplicaSet, error
 	return replicaSet, nil
 }
 
-func CreateDeploymentFromTemplate(args *TemplateArgs) (apps_v1.Deployment, error) {
+func CreateDeploymentFromTemplate(args *TemplateArgs, overrideNamespace string) (apps_v1.Deployment, error) {
 	var deployment apps_v1.Deployment
+
+	if overrideNamespace != "" {
+		args.Namespace = overrideNamespace
+	}
 
 	yamlManifest, err := createYamlManifest("Deployment", args)
 	if err != nil {
@@ -59,6 +66,28 @@ func CreateDeploymentFromTemplate(args *TemplateArgs) (apps_v1.Deployment, error
 	}
 
 	return deployment, nil
+}
+
+func CreateNamespaceFromTemplate(args *TemplateArgs, overrideName string) (v1.Namespace, error) {
+	var namespace v1.Namespace
+
+	if overrideName != "" {
+		args.Name = overrideName
+		args.Namespace = overrideName
+	}
+
+	yamlManifest, err := createYamlManifest("Namespace", args)
+	if err != nil {
+		return namespace, err
+	}
+
+	// deserialise from YAML by using the json struct tags that are defined in the k8s API object structs
+	err = yaml.Unmarshal(yamlManifest, &namespace)
+	if err != nil {
+		return namespace, err
+	}
+
+	return namespace, nil
 }
 
 func createYamlManifest(objectType string, args *TemplateArgs) ([]byte, error) {

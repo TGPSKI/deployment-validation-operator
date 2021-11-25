@@ -78,7 +78,7 @@ func newEngineConfigWithAllChecks() config.Config {
 
 func createTestDeployment(replicas int32) (*appsv1.Deployment, error) {
 	d, err := testutils.CreateDeploymentFromTemplate(
-		testutils.NewTemplateArgs())
+		testutils.NewTemplateArgs(), "")
 	if err != nil {
 		return nil, err
 	}
@@ -201,6 +201,61 @@ func TestIncompatibleChecksAreDisabled(t *testing.T) {
 		}
 	}
 }
+
+// func TestRunValidationsDeletedNamespace(t *testing.T) {
+
+// 	customCheck := newCustomCheck
+// 	err := intializeEngine(customCheck)
+// 	if err != nil {
+// 		t.Errorf("Error initializing engine %v", err)
+// 	}
+
+// 	request := reconcile.Request{
+// 		NamespacedName: types.NamespacedName{Name: "foo", Namespace: "bar"},
+// 	}
+
+// 	RunValidations(request, , testutils.ObjectKind(&client.Object{}), false)
+
+// 	labels := getPromLabels(request.Namespace, request.Name, "Deployment")
+
+// 	metric, err := engine.GetMetric(customCheck.Name).GetMetricWith(labels)
+// 	if err != nil {
+// 		t.Errorf("Error getting prometheus metric: %v", err)
+// 	}
+
+// 	expectedConstLabelSubString := fmt.Sprintf(""+
+// 		"constLabels: {check_description=\"%s\",check_remediation=\"%s\"}",
+// 		customCheck.Description,
+// 		customCheck.Remediation,
+// 	)
+// 	if !strings.Contains(metric.Desc().String(), expectedConstLabelSubString) {
+// 		t.Errorf("Metric is missing expected constant labels! Expected:\n%s\nGot:\n%s",
+// 			expectedConstLabelSubString,
+// 			metric.Desc().String())
+// 	}
+
+// 	if metricValue := int(prom_tu.ToFloat64(metric)); metricValue != 1 {
+// 		t.Errorf("Deployment test failed %#v: got %d want %d", customCheck.Name, metricValue, 1)
+// 	}
+
+// 	// Problem resolved
+// 	replicaCnt = int32(3)
+// 	deployment.Spec.Replicas = &replicaCnt
+// 	RunValidations(request, deployment, testutils.ObjectKind(deployment), false)
+
+// 	// Metric with label combination should be successfully cleared because problem was resolved.
+// 	// The 'GetMetricWith()' function will create a new metric with provided labels if it
+// 	// does not exist. The default value of a metric is 0. Therefore, a value of 0 implies we
+// 	// successfully cleared the metric label combination.
+// 	metric, err = engine.GetMetric(customCheck.Name).GetMetricWith(labels)
+// 	if err != nil {
+// 		t.Errorf("Error getting prometheus metric: %v", err)
+// 	}
+
+// 	if metricValue := int(prom_tu.ToFloat64(metric)); metricValue != 0 {
+// 		t.Errorf("Deployment test failed %#v: got %d want %d", customCheck.Name, metricValue, 0)
+// 	}
+// }
 
 func stringInSlice(a string, list []string) bool {
 	for _, b := range list {

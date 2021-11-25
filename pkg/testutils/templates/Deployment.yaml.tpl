@@ -15,7 +15,7 @@ metadata:
   labels:
     app: github-mirror
   name: github-mirror
-  namespace: github-mirror-production
+  namespace: {{ .Namespace }}
   resourceVersion: "267502440"
   selfLink: /apis/apps/v1/namespaces/github-mirror-production/deployments/github-mirror
   uid: 3b4d6091-4c16-11ea-bf75-023e213e25c3
